@@ -146,13 +146,19 @@ void mat_actf(Mat m) {
   }
 }
 
-DTYPE actf(DTYPE x) { return 1.0 / (1.0 + expf(-x)); }
+// DTYPE actf(DTYPE x) { return 1.0 / (1.0 + expf(-x)); }
 // DTYPE actf(DTYPE x) { return x > 0 ? x : 0; }
+DTYPE actf(DTYPE x) { return x > 0 ? 1.5 * x : .5 * x; }
+// DTYPE actf(DTYPE x) { return sinf(x); }
+// DTYPE actf(DTYPE x) { return expf(x) - 1; }
 
-DTYPE d_actf(DTYPE x) {
-DTYPE ex = expf(-x);
-return ex / ((1 + ex) * (1 + ex));
-}
+// DTYPE d_actf(DTYPE x) {
+//   DTYPE ex = expf(-x);
+//   return ex / ((1 + ex) * (1 + ex));
+// }
 // DTYPE d_actf(DTYPE x) { return x > 0 ? 1 : 0; }
+DTYPE d_actf(DTYPE x) { return x > 0 ? 1.5 : .5; }
+// DTYPE d_actf(DTYPE x) { return cosf(x); }
+// DTYPE d_actf(DTYPE x) { return expf(x); }
 
 #endif // MAT_IMPL

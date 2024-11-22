@@ -113,32 +113,20 @@ void nn_grad(NN g, NN nn, Mat inp, Mat out) {
   }
   for (size_t idx = 0; idx < g.lc; idx++) {
     size_t l = g.lc - 1 - idx;
+    mat_fill(g.as[l], 0);
     for (size_t r = 0; r < g.ws[l].rows; r++) {
+      DTYPE z = mat_at(nn.bs[l], r, 0);
+      for (size_t j = 0; j < nn.as[l].rows; j++) {
+        z += mat_at(nn.as[l], j, 0) * mat_at(nn.ws[l], r, j);
+      }
       for (size_t c = 0; c < g.ws[l].cols; c++) {
-        DTYPE z = mat_at(nn.bs[l], r, 0);
-        for (size_t a = 0; a < nn.as[l].rows; a++) {
-          z += mat_at(nn.as[l], a, 0) * mat_at(nn.ws[l], r, a);
-        }
         mat_at(g.ws[l], r, c) =
             mat_at(nn.as[l], c, 0) * d_actf(z) * mat_at(g.as[l + 1], r, 0);
       }
-    }
-    for (size_t b = 0; b < g.bs[l].rows; b++) {
-      DTYPE z = mat_at(nn.bs[l], b, 0);
-      for (size_t a = 0; a < nn.as[l].rows; a++) {
-        z += mat_at(nn.as[l], a, 0) * mat_at(nn.ws[l], b, a);
-      }
-      mat_at(g.bs[l], b, 0) = d_actf(z) * mat_at(g.as[l + 1], b, 0);
-    }
-    for (size_t a = 0; a < g.as[l].rows; a++) {
-      mat_at(g.as[l], a, 0) = 0;
-      for (size_t i = 0; i < g.as[l + 1].rows; i++) {
-        DTYPE z = mat_at(nn.bs[l], i, 0);
-        for (size_t a = 0; a < nn.as[l].rows; a++) {
-          z += mat_at(nn.as[l], a, 0) * mat_at(nn.ws[l], i, a);
-        }
+      mat_at(g.bs[l], r, 0) = d_actf(z) * mat_at(g.as[l + 1], r, 0);
+      for (size_t a = 0; a < g.as[l].rows; a++) {
         mat_at(g.as[l], a, 0) +=
-            mat_at(nn.ws[l], i, a) * d_actf(z) * mat_at(g.as[l + 1], a, 0);
+            mat_at(nn.ws[l], r, a) * d_actf(z) * mat_at(g.as[l + 1], a, 0);
       }
     }
   }
@@ -171,7 +159,7 @@ void nn_train(NN g, NN nn, Mat inp, Mat out) {
   assert(inp.cols == out.cols);
   DTYPE cost = nn_cost_many(nn, inp, out);
   printf("\nCost before training: %f\n", cost);
-  for (size_t i = 0; i < 1e6; i++) {
+  for (size_t i = 0; i < 1e5; i++) {
     nn_step(g, nn, inp, out);
   }
   cost = nn_cost_many(nn, inp, out);

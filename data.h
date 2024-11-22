@@ -7,11 +7,12 @@
 #define array_lenf(a) sizeof(a) / sizeof(DTYPE)
 
 Mat *get_data() {
-  size_t shape_prim[] = {1, 1};
+  size_t shape_prim[] = {2, 1};
 
-  DTYPE data_a[] = {0, 1, 2, 3, 4, 5, 6, 7,
-
-                    .1, .15, .25, .35, .55, .65, .85, .95};
+  DTYPE data_a[] = {0, 0, 1, 1, 
+                    0, 1, 0, 1,
+                    
+                    0, 0, 0, 1,};
 
   size_t r = shape_prim[0] + shape_prim[1];
   assert(array_lenf(data_a) % r == 0);
